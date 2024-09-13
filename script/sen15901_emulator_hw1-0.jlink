@@ -1,0 +1,6 @@
+r
+loadfile hw1-0/sen15901-emulator.hex
+verifyfile hw1-0/sen15901-emulator.hex
+r
+g
+qc
