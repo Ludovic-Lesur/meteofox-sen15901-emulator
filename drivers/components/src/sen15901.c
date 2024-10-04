@@ -34,7 +34,7 @@
 
 /*******************************************************************/
 typedef struct {
-    const GPIO_pin_t *gpio;
+    const GPIO_pin_t* gpio;
     const uint32_t angle;
     uint32_t angle_min;
     uint32_t angle_max;
@@ -48,8 +48,17 @@ typedef struct {
 
 /*** SEN15901 local global variables ***/
 
-static const TIM_gpio_t TIM_GPIO_WIND_SPEED = { .channel = SEN15901_WIND_SPEED_TIMER_CHANNEL, .gpio = &GPIO_WIND_SPEED, .polarity = TIM_POLARITY_ACTIVE_HIGH };
-static const TIM_gpio_t TIM_GPIO_RAINFALL = { .channel = SEN15901_RAINFALL_TIMER_CHANNEL, .gpio = &GPIO_RAINFALL, .polarity = TIM_POLARITY_ACTIVE_HIGH };
+// @formatter:off
+static const TIM_gpio_t TIM_GPIO_WIND_SPEED = {
+    .channel = SEN15901_WIND_SPEED_TIMER_CHANNEL,
+    .gpio = &GPIO_WIND_SPEED,
+    .polarity = TIM_POLARITY_ACTIVE_HIGH
+};
+static const TIM_gpio_t TIM_GPIO_RAINFALL = {
+    .channel = SEN15901_RAINFALL_TIMER_CHANNEL,
+    .gpio = &GPIO_RAINFALL,
+    .polarity = TIM_POLARITY_ACTIVE_HIGH
+};
 static SEN15901_wind_direction_resistor_t SEN159001_WIND_DIRECTION_RESISTOR[SEN15901_WIND_DIRECTION_RESISTOR_NUMBER] = {
     { &GPIO_WIND_DIRECTION_N, 0, 0, 0 },
     { &GPIO_WIND_DIRECTION_NE, 45, 0, 0 },
@@ -60,6 +69,7 @@ static SEN15901_wind_direction_resistor_t SEN159001_WIND_DIRECTION_RESISTOR[SEN1
     { &GPIO_WIND_DIRECTION_W, 270, 0, 0 },
     { &GPIO_WIND_DIRECTION_NW, 315, 0, 0 },
 };
+// @formatter:on
 static SEN15901_context_t sen15901_ctx;
 
 /*** SEN15901 functions ***/

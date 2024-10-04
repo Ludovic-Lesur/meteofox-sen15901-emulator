@@ -11,7 +11,7 @@
 #include "gpio.h"
 #include "usart.h"
 
-/*** MAPPING global variables ***/
+/*** GPIO MAPPING global variables ***/
 
 // TCXO power control.
 extern const GPIO_pin_t GPIO_TCXO_POWER_ENABLE;

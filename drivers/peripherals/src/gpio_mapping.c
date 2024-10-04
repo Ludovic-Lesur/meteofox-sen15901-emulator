@@ -15,7 +15,7 @@
 static const GPIO_pin_t GPIO_USART2_TX = { GPIOA, 0, 2, 4 };
 static const GPIO_pin_t GPIO_USART2_RX = { GPIOA, 0, 15, 4 };
 
-/*** MAPPING global variables ***/
+/*** GPIO MAPPING global variables ***/
 
 // TCXO power control.
 const GPIO_pin_t GPIO_TCXO_POWER_ENABLE = { GPIOA, 0, 1, 0 };

@@ -20,29 +20,29 @@
 
 /*** SIMULATION local macros ***/
 
-#define SIMULATION_WIND_SPEED_KMH_MAX			100
+#define SIMULATION_WIND_SPEED_KMH_MAX           100
 
-#define SIMULATION_RAINFALL_MM_MAX				200
-#define SIMULATION_RAINFALL_TIMESTAMP_MS		1800000
+#define SIMULATION_RAINFALL_MM_MAX              200
+#define SIMULATION_RAINFALL_TIMESTAMP_MS        1800000
 
-#define SIMULATION_WAVEFORM_TIMER_INSTANCE		TIM_INSTANCE_TIM2
-#define SIMULATION_WAVEFORM_TIMER_PERIOD_MS		3001
+#define SIMULATION_WAVEFORM_TIMER_INSTANCE      TIM_INSTANCE_TIM2
+#define SIMULATION_WAVEFORM_TIMER_PERIOD_MS     3001
 
-#define SIMULATION_DUT_SYNCHRO_IRQ_FILTER_MS	60000
+#define SIMULATION_DUT_SYNCHRO_IRQ_FILTER_MS    60000
 
-#define SIMULATION_LOG_USART_INSTANCE			USART_INSTANCE_USART2
-#define SIMULATION_LOG_USART_BAUD_RATE			9600
+#define SIMULATION_LOG_USART_INSTANCE           USART_INSTANCE_USART2
+#define SIMULATION_LOG_USART_BAUD_RATE          9600
 
 /*** SIMULATION local structures ***/
 
 /*******************************************************************/
 typedef union {
     struct {
-        unsigned wind_speed_down;
-        unsigned timer;
-        unsigned synchro;
-        unsigned first_synchro;
-        unsigned synchro_irq_enable;
+        unsigned wind_speed_down :1;
+        unsigned timer :1;
+        unsigned synchro :1;
+        unsigned first_synchro :1;
+        unsigned synchro_irq_enable :1;
     } __attribute__((scalar_storage_order("big-endian")))__attribute__((packed));
     ;
     uint8_t all;
@@ -175,8 +175,7 @@ SIMULATION_status_t SIMULATION_process(void) {
     SEN15901_status_t sen15901_status = SEN15901_SUCCESS;
     USART_status_t usart_status = USART_SUCCESS;
     // Do not start before first DUT synchronization.
-    if (simulation_ctx.flags.first_synchro == 0)
-        goto errors;
+    if (simulation_ctx.flags.first_synchro == 0) goto errors;
     // Check synchronization flag.
     if (simulation_ctx.flags.synchro != 0) {
         // Clear flag.

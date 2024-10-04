@@ -38,54 +38,54 @@ typedef enum {
 /*!******************************************************************
  * \fn SEN15901_status_t SEN15901_init(void)
  * \brief Init SEN15901 emulator driver.
- * \param[in]  	none
- * \param[out] 	none
- * \retval		Function execution status.
+ * \param[in]   none
+ * \param[out]  none
+ * \retval      Function execution status.
  *******************************************************************/
 SEN15901_status_t SEN15901_init(void);
 
 /*!******************************************************************
  * \fn SEN15901_status_t SEN15901_de_init(void)
  * \brief Release SEN15901 emulator driver.
- * \param[in]  	none
- * \param[out] 	none
- * \retval		Function execution status.
+ * \param[in]   none
+ * \param[out]  none
+ * \retval      Function execution status.
  *******************************************************************/
 SEN15901_status_t SEN15901_de_init(void);
 
 /*!******************************************************************
  * \fn SEN15901_status_t SEN15901_set_wind_speed(uint32_t wind_speed_kmh)
  * \brief Set SEN15901 test waveform to simulate a wind speed.
- * \param[in]  	wind_speed_kmh: Wind speed to simulate in km/h.
- * \param[out] 	none
- * \retval		Function execution status.
+ * \param[in]   wind_speed_kmh: Wind speed to simulate in km/h.
+ * \param[out]  none
+ * \retval      Function execution status.
  *******************************************************************/
 SEN15901_status_t SEN15901_set_wind_speed(uint32_t wind_speed_kmh);
 
 /*!******************************************************************
  * \fn SEN15901_status_t SEN15901_set_wind_direction(uint32_t wind_direction_degrees)
  * \brief Set SEN15901 test waveform to simulate a wind direction.
- * \param[in]  	wind_direction_degrees: Wind direction to simulate in degrees.
- * \param[out] 	none
- * \retval		Function execution status.
+ * \param[in]   wind_direction_degrees: Wind direction to simulate in degrees.
+ * \param[out]  none
+ * \retval      Function execution status.
  *******************************************************************/
 SEN15901_status_t SEN15901_set_wind_direction(uint32_t wind_direction_degrees);
 
 /*!******************************************************************
  * \fn void SEN15901_reset_rainfall_mm(void)
  * \brief Reset SEN15901 rainfall count.
- * \param[in]  	none
- * \param[out] 	none
- * \retval		none
+ * \param[in]   none
+ * \param[out]  none
+ * \retval      none
  *******************************************************************/
 void SEN15901_reset_rainfall_mm(void);
 
 /*!******************************************************************
  * \fn SEN15901_status_t SEN15901_add_rainfall_mm(uint32_t rainfall_mm)
  * \brief Set SEN15901 test waveform to simulate a rainfall.
- * \param[in]  	rainfall_mm: Rainfall to add in mm.
- * \param[out] 	none
- * \retval		Function execution status.
+ * \param[in]   rainfall_mm: Rainfall to add in mm.
+ * \param[out]  none
+ * \retval      Function execution status.
  *******************************************************************/
 SEN15901_status_t SEN15901_add_rainfall_mm(uint32_t rainfall_mm);
 
