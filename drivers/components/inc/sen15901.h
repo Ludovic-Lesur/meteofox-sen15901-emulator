@@ -11,6 +11,11 @@
 #include "tim.h"
 #include "types.h"
 
+/*** SEN15901 macros ***/
+
+#define SEN15901_WIND_DIRECTION_RESISTOR_NUMBER     8
+#define SEN15901_WIND_DIRECTION_NUMBER              (SEN15901_WIND_DIRECTION_RESISTOR_NUMBER << 1)
+
 /*** SEN15901 structures ***/
 
 /*!******************************************************************
@@ -18,14 +23,14 @@
  * \brief SEN15901 emulator driver error codes.
  *******************************************************************/
 typedef enum {
-	// Driver errors.
-	SEN15901_SUCCESS = 0,
-	SEN15901_ERROR_WIND_DIRECTION,
-	// Low level driver errors.
-	SEN15901_ERROR_BASE_TIM_WIND_SPEED = 0x0100,
-	SEN15901_ERROR_BASE_TIM_RAINFALL = (SEN15901_ERROR_BASE_TIM_WIND_SPEED + TIM_ERROR_BASE_LAST),
-	// Last base value.
-	SEN15901_ERROR_BASE_LAST = (SEN15901_ERROR_BASE_TIM_RAINFALL + TIM_ERROR_BASE_LAST)
+    // Driver errors.
+    SEN15901_SUCCESS = 0,
+    SEN15901_ERROR_WIND_DIRECTION,
+    // Low level driver errors.
+    SEN15901_ERROR_BASE_TIM_WIND_SPEED = 0x0100,
+    SEN15901_ERROR_BASE_TIM_RAINFALL = (SEN15901_ERROR_BASE_TIM_WIND_SPEED + TIM_ERROR_BASE_LAST),
+    // Last base value.
+    SEN15901_ERROR_BASE_LAST = (SEN15901_ERROR_BASE_TIM_RAINFALL + TIM_ERROR_BASE_LAST)
 } SEN15901_status_t;
 
 /*** SEN15901 functions ***/
@@ -65,6 +70,15 @@ SEN15901_status_t SEN15901_set_wind_speed(uint32_t wind_speed_kmh);
  * \retval		Function execution status.
  *******************************************************************/
 SEN15901_status_t SEN15901_set_wind_direction(uint32_t wind_direction_degrees);
+
+/*!******************************************************************
+ * \fn void SEN15901_reset_rainfall_mm(void)
+ * \brief Reset SEN15901 rainfall count.
+ * \param[in]  	none
+ * \param[out] 	none
+ * \retval		none
+ *******************************************************************/
+void SEN15901_reset_rainfall_mm(void);
 
 /*!******************************************************************
  * \fn SEN15901_status_t SEN15901_add_rainfall_mm(uint32_t rainfall_mm)

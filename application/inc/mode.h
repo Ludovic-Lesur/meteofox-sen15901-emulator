@@ -11,5 +11,4 @@
 /*** Board modes ***/
 
 //#define DEBUG
-
 #endif /* __MODE_H__ */

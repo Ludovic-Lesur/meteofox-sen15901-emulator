@@ -13,11 +13,14 @@
  * \brief NVIC interrupt priorities list.
  *******************************************************************/
 typedef enum {
-	// Common.
-	NVIC_PRIORITY_CLOCK = 0,
-	NVIC_PRIORITY_CLOCK_CALIBRATION = 1,
-	NVIC_PRIORITY_DELAY = 2,
-	NVIC_PRIORITY_RTC = 3,
+    // Common.
+    NVIC_PRIORITY_CLOCK = 0,
+    NVIC_PRIORITY_CLOCK_CALIBRATION = 1,
+    NVIC_PRIORITY_SIMULATION_WAVEFORM_TIMER = 0,
+    NVIC_PRIORITY_DUT_SYNCHRONIZATION = 1,
+    NVIC_PRIORITY_DELAY = 2,
+    NVIC_PRIORITY_RTC = 3,
+    NVIC_PRIORITY_LOG_USART = 3
 } NVIC_priority_list_t;
 
 #endif /* __NVIC_PRIORITY_H__ */

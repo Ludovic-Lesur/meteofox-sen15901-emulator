@@ -10,6 +10,6 @@
 
 /*** STM32L0xx registers compilation flags ***/
 
-#define STM32L0XX_REGISTERS_MCU_CATEGORY	2
+#define STM32L0XX_REGISTERS_MCU_CATEGORY    2
 
 #endif /* __STM32L0XX_REGISTERS_FLAGS_H__ */
