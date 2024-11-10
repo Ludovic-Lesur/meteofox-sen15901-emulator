@@ -1,7 +1,7 @@
 /*
- * spsws_hw1-0.ld
+ * sen15901_emulator_hw1-0.ld
  *
- *  Created on: 26 apr. 2018
+ *  Created on: 08 sep. 2024
  *      Author: ARM
  */
 

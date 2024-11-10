@@ -1,7 +1,7 @@
 /*
- * spsws_startup.c
+ * sen15901_emulator_startup.c
  *
- *  Created on: 6 mar. 2023
+ *  Created on: 08 sep. 2024
  *      Author: ARM
  */
 
