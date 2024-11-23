@@ -21,7 +21,7 @@
 #include "simulation.h"
 // Applicative.
 #include "error_base.h"
-#include "mode.h"
+#include "sen15901_emulator_flags.h"
 
 /*** MAIN local functions ***/
 
@@ -31,7 +31,7 @@ void _SEN15901_EMULATOR_init_hw(void) {
     RCC_status_t rcc_status = RCC_SUCCESS;
     RTC_status_t rtc_status = RTC_SUCCESS;
     SIMULATION_status_t simulation_status = SIMULATION_SUCCESS;
-#ifndef DEBUG
+#ifndef SEN15901_EMULATOR_MODE_DEBUG
     IWDG_status_t iwdg_status = IWDG_SUCCESS;
 #endif
     // Init error stack
@@ -45,7 +45,7 @@ void _SEN15901_EMULATOR_init_hw(void) {
     // Init GPIOs.
     GPIO_init();
     EXTI_init();
-#ifndef DEBUG
+#ifndef SEN15901_EMULATOR_MODE_DEBUG
     // Start independent watchdog.
     iwdg_status = IWDG_init();
     IWDG_stack_error(ERROR_BASE_IWDG);

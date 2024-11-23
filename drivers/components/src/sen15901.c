@@ -48,7 +48,6 @@ typedef struct {
 
 /*** SEN15901 local global variables ***/
 
-// @formatter:off
 static const TIM_gpio_t TIM_GPIO_WIND_SPEED = {
     .channel = SEN15901_WIND_SPEED_TIMER_CHANNEL,
     .gpio = &GPIO_WIND_SPEED,
@@ -69,7 +68,6 @@ static SEN15901_wind_direction_resistor_t SEN159001_WIND_DIRECTION_RESISTOR[SEN1
     { &GPIO_WIND_DIRECTION_W, 270, 0, 0 },
     { &GPIO_WIND_DIRECTION_NW, 315, 0, 0 },
 };
-// @formatter:on
 static SEN15901_context_t sen15901_ctx;
 
 /*** SEN15901 functions ***/
