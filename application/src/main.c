@@ -26,7 +26,7 @@
 /*** MAIN local functions ***/
 
 /*******************************************************************/
-void _SEN15901_EMULATOR_init_hw(void) {
+static void _SEN15901_EMULATOR_init_hw(void) {
     // Local variables.
     RCC_status_t rcc_status = RCC_SUCCESS;
     RTC_status_t rtc_status = RTC_SUCCESS;

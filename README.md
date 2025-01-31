@@ -20,9 +20,8 @@ The project is currently under development on a **STM32L031K6U6** microcontrolle
 
 The project is organized as follow:
 
-* `startup` : MCU **startup** code (from ARM).
-* `linker` : MCU **linker** script (from ARM).
 * `drivers` :
+    * `device` : MCU **startup** code and **linker** script.
     * `registers` : MCU **registers** address definition.
     * `peripherals` : internal MCU **peripherals** drivers.
     * `components` : external **components** drivers.
