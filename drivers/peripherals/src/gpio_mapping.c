@@ -8,7 +8,7 @@
 #include "gpio_mapping.h"
 
 #include "gpio.h"
-#include "gpio_reg.h"
+#include "gpio_registers.h"
 
 /*** GPIO MAPPING local global variables ***/
 

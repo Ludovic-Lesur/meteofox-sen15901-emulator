@@ -48,16 +48,32 @@ typedef struct {
 
 /*** SEN15901 local global variables ***/
 
-static const TIM_gpio_t TIM_GPIO_WIND_SPEED = {
+static const TIM_channel_gpio_t TIM_GPIO_WIND_SPEED = {
     .channel = SEN15901_WIND_SPEED_TIMER_CHANNEL,
     .gpio = &GPIO_WIND_SPEED,
     .polarity = TIM_POLARITY_ACTIVE_HIGH
 };
-static const TIM_gpio_t TIM_GPIO_RAINFALL = {
+
+static const TIM_channel_gpio_t* TIM_PWM_GPIO_LIST[1] = { &TIM_GPIO_WIND_SPEED };
+
+static const TIM_gpio_t TIM_PWM_GPIO = {
+    .list = TIM_PWM_GPIO_LIST,
+    .list_size = 1
+};
+
+static const TIM_channel_gpio_t TIM_GPIO_RAINFALL = {
     .channel = SEN15901_RAINFALL_TIMER_CHANNEL,
     .gpio = &GPIO_RAINFALL,
     .polarity = TIM_POLARITY_ACTIVE_HIGH
 };
+
+static const TIM_channel_gpio_t* TIM_OPM_GPIO_LIST[1] = { &TIM_GPIO_RAINFALL };
+
+static const TIM_gpio_t TIM_OPM_GPIO = {
+    .list = TIM_OPM_GPIO_LIST,
+    .list_size = 1
+};
+
 static SEN15901_wind_direction_resistor_t SEN159001_WIND_DIRECTION_RESISTOR[SEN15901_WIND_DIRECTION_RESISTOR_NUMBER] = {
     { &GPIO_WIND_DIRECTION_N, 0, 0, 0 },
     { &GPIO_WIND_DIRECTION_NE, 45, 0, 0 },
@@ -68,6 +84,7 @@ static SEN15901_wind_direction_resistor_t SEN159001_WIND_DIRECTION_RESISTOR[SEN1
     { &GPIO_WIND_DIRECTION_W, 270, 0, 0 },
     { &GPIO_WIND_DIRECTION_NW, 315, 0, 0 },
 };
+
 static SEN15901_context_t sen15901_ctx;
 
 /*** SEN15901 functions ***/
@@ -94,10 +111,10 @@ SEN15901_status_t SEN15901_init(void) {
         SEN159001_WIND_DIRECTION_RESISTOR[idx].angle_max = (tmp_s32 > MATH_2_PI_DEGREES) ? ((uint32_t) (tmp_s32 - MATH_2_PI_DEGREES)) : ((uint32_t) tmp_s32);
     }
     // Init PWM timer for wind speed.
-    tim_status = TIM_PWM_init(SEN15901_WIND_SPEED_TIMER_INSTANCE, (TIM_gpio_t*) &TIM_GPIO_WIND_SPEED, 1);
+    tim_status = TIM_PWM_init(SEN15901_WIND_SPEED_TIMER_INSTANCE, (TIM_gpio_t*) &TIM_PWM_GPIO);
     TIM_exit_error(SEN15901_ERROR_BASE_TIM_WIND_SPEED);
     // Init OPM timer for rainfall.
-    tim_status = TIM_OPM_init(SEN15901_RAINFALL_TIMER_INSTANCE, (TIM_gpio_t*) &TIM_GPIO_RAINFALL, 1);
+    tim_status = TIM_OPM_init(SEN15901_RAINFALL_TIMER_INSTANCE, (TIM_gpio_t*) &TIM_OPM_GPIO);
     TIM_exit_error(SEN15901_ERROR_BASE_TIM_RAINFALL);
 errors:
     return status;
@@ -109,10 +126,10 @@ SEN15901_status_t SEN15901_de_init(void) {
     SEN15901_status_t status = SEN15901_SUCCESS;
     TIM_status_t tim_status = TIM_SUCCESS;
     // Release PWM timer for wind speed.
-    tim_status = TIM_PWM_de_init(SEN15901_WIND_SPEED_TIMER_INSTANCE, (TIM_gpio_t*) &TIM_GPIO_WIND_SPEED, 1);
+    tim_status = TIM_PWM_de_init(SEN15901_WIND_SPEED_TIMER_INSTANCE, (TIM_gpio_t*) &TIM_PWM_GPIO);
     TIM_exit_error(SEN15901_ERROR_BASE_TIM_WIND_SPEED);
     // Release OPM timer for rainfall.
-    tim_status = TIM_OPM_de_init(SEN15901_RAINFALL_TIMER_INSTANCE, (TIM_gpio_t*) &TIM_GPIO_RAINFALL, 1);
+    tim_status = TIM_OPM_de_init(SEN15901_RAINFALL_TIMER_INSTANCE, (TIM_gpio_t*) &TIM_OPM_GPIO);
     TIM_exit_error(SEN15901_ERROR_BASE_TIM_RAINFALL);
 errors:
     return status;

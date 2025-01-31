@@ -8,11 +8,13 @@
 #ifndef __STM32L0XX_DRIVERS_FLAGS_H__
 #define __STM32L0XX_DRIVERS_FLAGS_H__
 
-/*** STM32L0XX DRIVERS compilation flags ***/
+/*** STM32L0xx drivers compilation flags ***/
 
 #define STM32L0XX_DRIVERS_DMA_CHANNEL_MASK              0x00
 
 #define STM32L0XX_DRIVERS_EXTI_GPIO_MASK                0x0080
+
+//#define STM32L0XX_DRIVERS_I2C_FAST_MODE
 
 #define STM32L0XX_DRIVERS_LPUART_MODE                   0
 //#define STM32L0XX_DRIVERS_LPUART_DISABLE_TX_0

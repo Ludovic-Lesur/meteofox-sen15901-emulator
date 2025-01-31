@@ -147,7 +147,7 @@ SIMULATION_status_t SIMULATION_start(void) {
     simulation_ctx.flags.synchro_irq_enable = 1;
     EXTI_enable_gpio_interrupt(&GPIO_DUT_SYNCHRO);
     // Start timer.
-    tim_status = TIM_STD_start(SIMULATION_WAVEFORM_TIMER_INSTANCE, ((uint32_t) SIMULATION_WAVEFORM_TIMER_PERIOD_MS * (uint32_t) 1000000), &_SIMULATION_timer_callback);
+    tim_status = TIM_STD_start(SIMULATION_WAVEFORM_TIMER_INSTANCE, SIMULATION_WAVEFORM_TIMER_PERIOD_MS, TIM_UNIT_MS, &_SIMULATION_timer_callback);
     TIM_exit_error(SIMULATION_ERROR_BASE_WAVEFORM_TIMER);
 errors:
     return status;
