@@ -44,7 +44,6 @@ typedef union {
         unsigned first_synchro :1;
         unsigned synchro_irq_enable :1;
     } __attribute__((scalar_storage_order("big-endian")))__attribute__((packed));
-    ;
     uint8_t all;
 } SIMULATION_flags_t;
 
