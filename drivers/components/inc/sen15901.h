@@ -8,6 +8,7 @@
 #ifndef __SEN15901_H__
 #define __SEN15901_H__
 
+#include "error.h"
 #include "tim.h"
 #include "types.h"
 
@@ -27,7 +28,7 @@ typedef enum {
     SEN15901_SUCCESS = 0,
     SEN15901_ERROR_WIND_DIRECTION,
     // Low level driver errors.
-    SEN15901_ERROR_BASE_TIM_WIND_SPEED = 0x0100,
+    SEN15901_ERROR_BASE_TIM_WIND_SPEED = ERROR_BASE_STEP,
     SEN15901_ERROR_BASE_TIM_RAINFALL = (SEN15901_ERROR_BASE_TIM_WIND_SPEED + TIM_ERROR_BASE_LAST),
     // Last base value.
     SEN15901_ERROR_BASE_LAST = (SEN15901_ERROR_BASE_TIM_RAINFALL + TIM_ERROR_BASE_LAST)

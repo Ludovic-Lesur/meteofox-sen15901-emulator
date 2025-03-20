@@ -8,6 +8,7 @@
 #ifndef __SIMULATION_H__
 #define __SIMULATION_H__
 
+#include "error.h"
 #include "sen15901.h"
 #include "tim.h"
 #include "types.h"
@@ -23,7 +24,7 @@ typedef enum {
     // Driver errors.
     SIMULATION_SUCCESS = 0,
     // Low level driver errors.
-    SIMULATION_ERROR_BASE_WAVEFORM_TIMER = 0x0100,
+    SIMULATION_ERROR_BASE_WAVEFORM_TIMER = ERROR_BASE_STEP,
     SIMULATION_ERROR_BASE_LOG_USART = (SIMULATION_ERROR_BASE_WAVEFORM_TIMER + TIM_ERROR_BASE_LAST),
     SIMULATION_ERROR_BASE_SEN15901 = (SIMULATION_ERROR_BASE_LOG_USART + USART_ERROR_BASE_LAST),
     // Last base value.
