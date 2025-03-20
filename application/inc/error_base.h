@@ -15,6 +15,8 @@
 #include "rtc.h"
 // Utils.
 #include "error.h"
+// Components.
+#include "sen15901.h"
 // Middleware.
 #include "simulation.h"
 
@@ -31,8 +33,10 @@ typedef enum {
     ERROR_BASE_LPTIM = (ERROR_BASE_IWDG + IWDG_ERROR_BASE_LAST),
     ERROR_BASE_RCC = (ERROR_BASE_LPTIM + LPTIM_ERROR_BASE_LAST),
     ERROR_BASE_RTC = (ERROR_BASE_RCC + RCC_ERROR_BASE_LAST),
+    // Components.
+    ERROR_BASE_SEN15901 = (ERROR_BASE_RTC + RTC_ERROR_BASE_LAST),
     // Middleware.
-    ERROR_BASE_SIMULATION = (ERROR_BASE_RTC + RTC_ERROR_BASE_LAST),
+    ERROR_BASE_SIMULATION = (ERROR_BASE_SEN15901 + SEN15901_ERROR_BASE_LAST),
     // Last base value.
     ERROR_BASE_LAST = (ERROR_BASE_SIMULATION + SIMULATION_ERROR_BASE_LAST)
 } ERROR_base_t;

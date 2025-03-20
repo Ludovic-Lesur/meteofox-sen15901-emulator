@@ -99,11 +99,10 @@ SEN15901_status_t SEN15901_de_init(void) {
     TIM_status_t tim_status = TIM_SUCCESS;
     // Release PWM timer for wind speed.
     tim_status = TIM_PWM_de_init(TIM_INSTANCE_WIND_SPEED, (TIM_gpio_t*) &TIM_GPIO_WIND_SPEED);
-    TIM_exit_error(SEN15901_ERROR_BASE_TIM_WIND_SPEED);
+    TIM_stack_error(ERROR_BASE_SEN15901 + SEN15901_ERROR_BASE_TIM_WIND_SPEED);
     // Release OPM timer for rainfall.
     tim_status = TIM_OPM_de_init(TIM_INSTANCE_RAINFALL, (TIM_gpio_t*) &TIM_GPIO_RAINFALL);
-    TIM_exit_error(SEN15901_ERROR_BASE_TIM_RAINFALL);
-errors:
+    TIM_stack_error(ERROR_BASE_SEN15901 + SEN15901_ERROR_BASE_TIM_RAINFALL);
     return status;
 }
 

@@ -8,6 +8,7 @@
 #include "simulation.h"
 
 #include "error.h"
+#include "error_base.h"
 #include "exti.h"
 #include "nvic_priority.h"
 #include "gpio.h"
@@ -140,8 +141,7 @@ SIMULATION_status_t SIMULATION_de_init(void) {
     EXTI_release_gpio(&GPIO_DUT_SYNCHRO, GPIO_MODE_ANALOG);
     // Init SEN15901 emulator.
     sen15901_status = SEN15901_de_init();
-    SEN15901_exit_error(SIMULATION_ERROR_BASE_SEN15901);
-errors:
+    SEN15901_stack_error(ERROR_BASE_SIMULATION + SIMULATION_ERROR_BASE_SEN15901);
     return status;
 }
 
