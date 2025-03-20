@@ -180,13 +180,13 @@ SEN15901_status_t SEN15901_add_rainfall_mm(uint32_t rainfall_mm) {
     // Add required number of pulses.
     while (sen15901_ctx.rainfall_um < sen15901_ctx.rainfall_target_um) {
         // Make pulse.
-        tim_status = TIM_OPM_make_pulse(TIM_INSTANCE_RAINFALL, TIM_CHANNEL_RAINFALL, pulse_duration_ns, pulse_duration_ns);
+        tim_status = TIM_OPM_make_pulse(TIM_INSTANCE_RAINFALL, (0b1 << TIM_CHANNEL_RAINFALL), pulse_duration_ns, pulse_duration_ns, 0);
         TIM_exit_error(SEN15901_ERROR_BASE_TIM_RAINFALL);
         // Update count.
         sen15901_ctx.rainfall_um += SEN15901_RAINFALL_EDGE_TO_UM;
         // Wait for pulse to be completed.
         do {
-            TIM_OPM_get_pulse_status(TIM_INSTANCE_RAINFALL, TIM_CHANNEL_RAINFALL, &pulse_is_done);
+            TIM_OPM_get_pulse_status(TIM_INSTANCE_RAINFALL, &pulse_is_done);
         }
         while (pulse_is_done == 0);
     }

@@ -120,9 +120,10 @@ SIMULATION_status_t SIMULATION_init(void) {
     tim_status = TIM_STD_init(TIM_INSTANCE_SIMULATION, NVIC_PRIORITY_SIMULATION_WAVEFORM_TIMER);
     TIM_exit_error(SIMULATION_ERROR_BASE_WAVEFORM_TIMER);
     // Init log interface.
+    usart_config.clock = RCC_CLOCK_SYSTEM;
     usart_config.baud_rate = SIMULATION_LOG_USART_BAUD_RATE;
     usart_config.nvic_priority = NVIC_PRIORITY_LOG_USART;
-    usart_config.rxne_callback = NULL;
+    usart_config.rxne_irq_callback = NULL;
     usart_status = USART_init(USART_INSTANCE_LOG, &USART_GPIO_LOG, &usart_config);
     USART_exit_error(SIMULATION_ERROR_BASE_LOG_USART);
     // Init SEN15901 emulator.
