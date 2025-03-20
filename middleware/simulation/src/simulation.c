@@ -62,7 +62,16 @@ typedef struct {
 /*** SIMULATION local global variables ***/
 
 static const uint32_t SIMULATION_WIND_DIRECTION_TABLE[SEN15901_WIND_DIRECTION_NUMBER] = { 0, 22, 45, 67, 90, 112, 135, 157, 180, 202, 225, 247, 270, 292, 315, 337 };
-static SIMULATION_context_t simulation_ctx;
+
+static SIMULATION_context_t simulation_ctx = {
+    .flags.all = 0,
+    .time_ms = 0,
+    .wind_speed_peak_kmh = 0,
+    .wind_direction_table_index = (SEN15901_WIND_DIRECTION_NUMBER - 1),
+    .rainfall_peak_mm = 0,
+    .wind_speed_kmh = 0,
+    .rainfall_mm = 0
+};
 
 /*** SIMULATION local functions ***/
 
@@ -100,7 +109,7 @@ SIMULATION_status_t SIMULATION_init(void) {
     simulation_ctx.rainfall_peak_mm = 0;
     simulation_ctx.wind_speed_kmh = 0;
     simulation_ctx.rainfall_mm = 0;
-    // Init LED pin.
+    // Init status LEDs.
     GPIO_configure(&GPIO_LED_RUN, GPIO_MODE_OUTPUT, GPIO_TYPE_PUSH_PULL, GPIO_SPEED_LOW, GPIO_PULL_NONE);
     GPIO_configure(&GPIO_LED_SYNCHRO, GPIO_MODE_OUTPUT, GPIO_TYPE_PUSH_PULL, GPIO_SPEED_LOW, GPIO_PULL_NONE);
     GPIO_configure(&GPIO_LED_FAULT, GPIO_MODE_OUTPUT, GPIO_TYPE_PUSH_PULL, GPIO_SPEED_LOW, GPIO_PULL_NONE);

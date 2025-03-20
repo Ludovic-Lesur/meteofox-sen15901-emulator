@@ -29,7 +29,7 @@
 
 /*******************************************************************/
 typedef struct {
-    const GPIO_pin_t* gpio;
+    const GPIO_pin_t* const gpio;
     const uint32_t angle;
     uint32_t angle_min;
     uint32_t angle_max;
@@ -54,7 +54,10 @@ static SEN15901_wind_direction_resistor_t SEN159001_WIND_DIRECTION_RESISTOR[SEN1
     { &GPIO_WIND_DIRECTION_NW, 315, 0, 0 },
 };
 
-static SEN15901_context_t sen15901_ctx;
+static SEN15901_context_t sen15901_ctx = {
+    .rainfall_um = 0,
+    .rainfall_target_um = 0
+};
 
 /*** SEN15901 functions ***/
 
