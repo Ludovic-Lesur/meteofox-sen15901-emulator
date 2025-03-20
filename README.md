@@ -4,7 +4,11 @@ The aim of this project is to design a **SEN-15901 emulator**. The program simul
 
 # Hardware
 
-The project is currently under development on a **Nucleo-L031K6 board**.
+The board was designed on **Circuit Maker V2.0**. Below is the list of hardware revisions:
+
+| Hardware revision | Description | Status |
+|:---:|:---:|:---:|
+| [SEN15901-EMULATOR HW1.0](https://365.altium.com/files/107B18F5-BE93-4D1A-97D6-74040E0FA2C4) | Initial version. | :white_check_mark: |
 
 # Embedded software
 
@@ -14,7 +18,8 @@ The embedded software is developed under **Eclipse IDE** version 2024-09 (4.33.0
 
 ## Target
 
-The project is currently under development on a **STM32L031K6U6** microcontroller of the STMicroelectronics L0 family.
+
+The board is based on the **STM32L041K6U6** microcontroller of the STMicroelectronics L0 family. Each hardware revision has a corresponding **build configuration** in the Eclipse project, which sets up the code for the selected board version.
 
 ## Structure
 
@@ -26,4 +31,6 @@ The project is organized as follow:
     * `peripherals` : internal MCU **peripherals** drivers.
     * `components` : external **components** drivers.
     * `utils` : **utility** functions.
+* `middleware` :
+    * `simulation` : SEN15901 **simulator state machine**.
 * `application` : Main **application**.
