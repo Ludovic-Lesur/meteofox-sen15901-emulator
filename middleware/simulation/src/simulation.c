@@ -11,7 +11,7 @@
 #include "exti.h"
 #include "nvic_priority.h"
 #include "gpio.h"
-#include "gpio_mapping.h"
+#include "mcu_mapping.h"
 #include "rtc.h"
 #include "sen15901.h"
 #include "tim.h"
@@ -25,12 +25,10 @@
 #define SIMULATION_RAINFALL_MM_MAX              200
 #define SIMULATION_RAINFALL_TIMESTAMP_MS        1800000
 
-#define SIMULATION_WAVEFORM_TIMER_INSTANCE      TIM_INSTANCE_TIM2
 #define SIMULATION_WAVEFORM_TIMER_PERIOD_MS     3001
 
 #define SIMULATION_DUT_SYNCHRO_IRQ_FILTER_MS    60000
 
-#define SIMULATION_LOG_USART_INSTANCE           USART_INSTANCE_USART2
 #define SIMULATION_LOG_USART_BAUD_RATE          9600
 
 /*** SIMULATION local structures ***/
@@ -103,18 +101,19 @@ SIMULATION_status_t SIMULATION_init(void) {
     simulation_ctx.wind_speed_kmh = 0;
     simulation_ctx.rainfall_mm = 0;
     // Init LED pin.
-    GPIO_configure(&GPIO_LED_SIMULATION, GPIO_MODE_OUTPUT, GPIO_TYPE_PUSH_PULL, GPIO_SPEED_LOW, GPIO_PULL_NONE);
+    GPIO_configure(&GPIO_LED_RUN, GPIO_MODE_OUTPUT, GPIO_TYPE_PUSH_PULL, GPIO_SPEED_LOW, GPIO_PULL_NONE);
     GPIO_configure(&GPIO_LED_SYNCHRO, GPIO_MODE_OUTPUT, GPIO_TYPE_PUSH_PULL, GPIO_SPEED_LOW, GPIO_PULL_NONE);
+    GPIO_configure(&GPIO_LED_FAULT, GPIO_MODE_OUTPUT, GPIO_TYPE_PUSH_PULL, GPIO_SPEED_LOW, GPIO_PULL_NONE);
     // Init synchronization signal.
     EXTI_configure_gpio(&GPIO_DUT_SYNCHRO, GPIO_PULL_DOWN, EXTI_TRIGGER_RISING_EDGE, &_SIMULATION_dut_synchro_callback, NVIC_PRIORITY_DUT_SYNCHRONIZATION);
     // Init waveform timer.
-    tim_status = TIM_STD_init(SIMULATION_WAVEFORM_TIMER_INSTANCE, NVIC_PRIORITY_SIMULATION_WAVEFORM_TIMER);
+    tim_status = TIM_STD_init(TIM_INSTANCE_SIMULATION, NVIC_PRIORITY_SIMULATION_WAVEFORM_TIMER);
     TIM_exit_error(SIMULATION_ERROR_BASE_WAVEFORM_TIMER);
     // Init log interface.
     usart_config.baud_rate = SIMULATION_LOG_USART_BAUD_RATE;
     usart_config.nvic_priority = NVIC_PRIORITY_LOG_USART;
     usart_config.rxne_callback = NULL;
-    usart_status = USART_init(SIMULATION_LOG_USART_INSTANCE, &GPIO_LOG_USART, &usart_config);
+    usart_status = USART_init(USART_INSTANCE_LOG, &USART_GPIO_LOG, &usart_config);
     USART_exit_error(SIMULATION_ERROR_BASE_LOG_USART);
     // Init SEN15901 emulator.
     sen15901_status = SEN15901_init();
@@ -146,7 +145,7 @@ SIMULATION_status_t SIMULATION_start(void) {
     simulation_ctx.flags.synchro_irq_enable = 1;
     EXTI_enable_gpio_interrupt(&GPIO_DUT_SYNCHRO);
     // Start timer.
-    tim_status = TIM_STD_start(SIMULATION_WAVEFORM_TIMER_INSTANCE, SIMULATION_WAVEFORM_TIMER_PERIOD_MS, TIM_UNIT_MS, &_SIMULATION_timer_callback);
+    tim_status = TIM_STD_start(TIM_INSTANCE_SIMULATION, SIMULATION_WAVEFORM_TIMER_PERIOD_MS, TIM_UNIT_MS, &_SIMULATION_timer_callback);
     TIM_exit_error(SIMULATION_ERROR_BASE_WAVEFORM_TIMER);
 errors:
     return status;
@@ -161,7 +160,7 @@ SIMULATION_status_t SIMULATION_stop(void) {
     EXTI_disable_gpio_interrupt(&GPIO_DUT_SYNCHRO);
     simulation_ctx.flags.synchro_irq_enable = 0;
     // Stop timer.
-    tim_status = TIM_STD_stop(SIMULATION_WAVEFORM_TIMER_INSTANCE);
+    tim_status = TIM_STD_stop(TIM_INSTANCE_SIMULATION);
     TIM_exit_error(SIMULATION_ERROR_BASE_WAVEFORM_TIMER);
 errors:
     return status;
@@ -190,7 +189,7 @@ SIMULATION_status_t SIMULATION_process(void) {
         simulation_ctx.wind_direction_table_index = (simulation_ctx.wind_direction_table_index + 1) % SEN15901_WIND_DIRECTION_NUMBER;
         simulation_ctx.rainfall_peak_mm = (simulation_ctx.rainfall_peak_mm + 1) % (SIMULATION_RAINFALL_MM_MAX + 1);
         // Log.
-        usart_status = USART_write(SIMULATION_LOG_USART_INSTANCE, (uint8_t*) "DUT SYNCHRO\r\n", 14);
+        usart_status = USART_write(USART_INSTANCE_LOG, (uint8_t*) "DUT SYNCHRO\r\n", 14);
         USART_exit_error(SIMULATION_ERROR_BASE_LOG_USART);
     }
     // Manage synchronization interrupt.
@@ -206,7 +205,7 @@ SIMULATION_status_t SIMULATION_process(void) {
         // Clear flag.
         simulation_ctx.flags.timer = 0;
         // Blink LED.
-        GPIO_toggle(&GPIO_LED_SIMULATION);
+        GPIO_toggle(&GPIO_LED_RUN);
         // Wind speed.
         if (simulation_ctx.wind_speed_peak_kmh > 0) {
             if (simulation_ctx.wind_speed_kmh >= simulation_ctx.wind_speed_peak_kmh) {

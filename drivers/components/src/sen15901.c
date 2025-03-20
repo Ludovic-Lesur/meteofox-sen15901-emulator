@@ -10,22 +10,17 @@
 #include "error.h"
 #include "error_base.h"
 #include "gpio.h"
-#include "gpio_mapping.h"
+#include "mcu_mapping.h"
 #include "tim.h"
 #include "types.h"
 
 /*** SEN15901 local macros ***/
-
-#define SEN15901_WIND_SPEED_TIMER_INSTANCE              TIM_INSTANCE_TIM22
-#define SEN15901_WIND_SPEED_TIMER_CHANNEL               TIM_CHANNEL_1
 
 #define SEN15901_WIND_SPEED_1HZ_TO_MH                   2400
 
 #define SEN15901_WIND_DIRECTION_RESISTOR_NUMBER         8
 #define SEN15901_WIND_DIRECTION_RESISTOR_RANGE_DEGREES  34
 
-#define SEN15901_RAINFALL_TIMER_INSTANCE                TIM_INSTANCE_TIM21
-#define SEN15901_RAINFALL_TIMER_CHANNEL                 TIM_CHANNEL_1
 #define SEN15901_RAINFALL_PULSE_DURATION_MS             200
 
 #define SEN15901_RAINFALL_EDGE_TO_UM                    279
@@ -47,32 +42,6 @@ typedef struct {
 } SEN15901_context_t;
 
 /*** SEN15901 local global variables ***/
-
-static const TIM_channel_gpio_t TIM_GPIO_WIND_SPEED = {
-    .channel = SEN15901_WIND_SPEED_TIMER_CHANNEL,
-    .gpio = &GPIO_WIND_SPEED,
-    .polarity = TIM_POLARITY_ACTIVE_HIGH
-};
-
-static const TIM_channel_gpio_t* TIM_PWM_GPIO_LIST[1] = { &TIM_GPIO_WIND_SPEED };
-
-static const TIM_gpio_t TIM_PWM_GPIO = {
-    .list = TIM_PWM_GPIO_LIST,
-    .list_size = 1
-};
-
-static const TIM_channel_gpio_t TIM_GPIO_RAINFALL = {
-    .channel = SEN15901_RAINFALL_TIMER_CHANNEL,
-    .gpio = &GPIO_RAINFALL,
-    .polarity = TIM_POLARITY_ACTIVE_HIGH
-};
-
-static const TIM_channel_gpio_t* TIM_OPM_GPIO_LIST[1] = { &TIM_GPIO_RAINFALL };
-
-static const TIM_gpio_t TIM_OPM_GPIO = {
-    .list = TIM_OPM_GPIO_LIST,
-    .list_size = 1
-};
 
 static SEN15901_wind_direction_resistor_t SEN159001_WIND_DIRECTION_RESISTOR[SEN15901_WIND_DIRECTION_RESISTOR_NUMBER] = {
     { &GPIO_WIND_DIRECTION_N, 0, 0, 0 },
@@ -111,10 +80,10 @@ SEN15901_status_t SEN15901_init(void) {
         SEN159001_WIND_DIRECTION_RESISTOR[idx].angle_max = (tmp_s32 > MATH_2_PI_DEGREES) ? ((uint32_t) (tmp_s32 - MATH_2_PI_DEGREES)) : ((uint32_t) tmp_s32);
     }
     // Init PWM timer for wind speed.
-    tim_status = TIM_PWM_init(SEN15901_WIND_SPEED_TIMER_INSTANCE, (TIM_gpio_t*) &TIM_PWM_GPIO);
+    tim_status = TIM_PWM_init(TIM_INSTANCE_WIND_SPEED, (TIM_gpio_t*) &TIM_GPIO_WIND_SPEED);
     TIM_exit_error(SEN15901_ERROR_BASE_TIM_WIND_SPEED);
     // Init OPM timer for rainfall.
-    tim_status = TIM_OPM_init(SEN15901_RAINFALL_TIMER_INSTANCE, (TIM_gpio_t*) &TIM_OPM_GPIO);
+    tim_status = TIM_OPM_init(TIM_INSTANCE_RAINFALL, (TIM_gpio_t*) &TIM_GPIO_RAINFALL);
     TIM_exit_error(SEN15901_ERROR_BASE_TIM_RAINFALL);
 errors:
     return status;
@@ -126,10 +95,10 @@ SEN15901_status_t SEN15901_de_init(void) {
     SEN15901_status_t status = SEN15901_SUCCESS;
     TIM_status_t tim_status = TIM_SUCCESS;
     // Release PWM timer for wind speed.
-    tim_status = TIM_PWM_de_init(SEN15901_WIND_SPEED_TIMER_INSTANCE, (TIM_gpio_t*) &TIM_PWM_GPIO);
+    tim_status = TIM_PWM_de_init(TIM_INSTANCE_WIND_SPEED, (TIM_gpio_t*) &TIM_GPIO_WIND_SPEED);
     TIM_exit_error(SEN15901_ERROR_BASE_TIM_WIND_SPEED);
     // Release OPM timer for rainfall.
-    tim_status = TIM_OPM_de_init(SEN15901_RAINFALL_TIMER_INSTANCE, (TIM_gpio_t*) &TIM_OPM_GPIO);
+    tim_status = TIM_OPM_de_init(TIM_INSTANCE_RAINFALL, (TIM_gpio_t*) &TIM_GPIO_RAINFALL);
     TIM_exit_error(SEN15901_ERROR_BASE_TIM_RAINFALL);
 errors:
     return status;
@@ -150,7 +119,7 @@ SEN15901_status_t SEN15901_set_wind_speed(uint32_t wind_speed_kmh) {
         pwm_frequency_mhz = 1;
         pwm_duty_cycle_percent = 0;
     }
-    tim_status = TIM_PWM_set_waveform(SEN15901_WIND_SPEED_TIMER_INSTANCE, SEN15901_WIND_SPEED_TIMER_CHANNEL, pwm_frequency_mhz, pwm_duty_cycle_percent);
+    tim_status = TIM_PWM_set_waveform(TIM_INSTANCE_WIND_SPEED, TIM_CHANNEL_WIND_SPEED, pwm_frequency_mhz, pwm_duty_cycle_percent);
     TIM_exit_error(SEN15901_ERROR_BASE_TIM_RAINFALL);
 errors:
     return status;
@@ -209,13 +178,13 @@ SEN15901_status_t SEN15901_add_rainfall_mm(uint32_t rainfall_mm) {
     // Add required number of pulses.
     while (sen15901_ctx.rainfall_um < sen15901_ctx.rainfall_target_um) {
         // Make pulse.
-        tim_status = TIM_OPM_make_pulse(SEN15901_RAINFALL_TIMER_INSTANCE, SEN15901_RAINFALL_TIMER_CHANNEL, pulse_duration_ns, pulse_duration_ns);
+        tim_status = TIM_OPM_make_pulse(TIM_INSTANCE_RAINFALL, TIM_CHANNEL_RAINFALL, pulse_duration_ns, pulse_duration_ns);
         TIM_exit_error(SEN15901_ERROR_BASE_TIM_RAINFALL);
         // Update count.
         sen15901_ctx.rainfall_um += SEN15901_RAINFALL_EDGE_TO_UM;
         // Wait for pulse to be completed.
         do {
-            TIM_OPM_get_pulse_status(SEN15901_RAINFALL_TIMER_INSTANCE, SEN15901_RAINFALL_TIMER_CHANNEL, &pulse_is_done);
+            TIM_OPM_get_pulse_status(TIM_INSTANCE_RAINFALL, TIM_CHANNEL_RAINFALL, &pulse_is_done);
         }
         while (pulse_is_done == 0);
     }
