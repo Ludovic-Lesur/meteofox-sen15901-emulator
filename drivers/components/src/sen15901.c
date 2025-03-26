@@ -73,8 +73,7 @@ SEN15901_status_t SEN15901_init(void) {
     sen15901_ctx.rainfall_target_um = 0;
     // Init wind vane resistors.
     for (idx = 0; idx < SEN15901_WIND_DIRECTION_RESISTOR_NUMBER; idx++) {
-        GPIO_write(SEN159001_WIND_DIRECTION_RESISTOR[idx].gpio, 1);
-        GPIO_configure(SEN159001_WIND_DIRECTION_RESISTOR[idx].gpio, GPIO_MODE_OUTPUT, GPIO_TYPE_OPEN_DRAIN, GPIO_SPEED_LOW, GPIO_PULL_NONE);
+        GPIO_configure(SEN159001_WIND_DIRECTION_RESISTOR[idx].gpio, GPIO_MODE_OUTPUT, GPIO_TYPE_PUSH_PULL, GPIO_SPEED_LOW, GPIO_PULL_NONE);
         // Compute minimum angle.
         tmp_s32 = SEN159001_WIND_DIRECTION_RESISTOR[idx].angle - SEN15901_WIND_DIRECTION_RESISTOR_RANGE_DEGREES;
         SEN159001_WIND_DIRECTION_RESISTOR[idx].angle_min = (tmp_s32 < 0) ? ((uint32_t) (tmp_s32 + MATH_2_PI_DEGREES)) : ((uint32_t) tmp_s32);
@@ -148,11 +147,11 @@ SEN15901_status_t SEN15901_set_wind_direction(uint32_t wind_direction_degrees) {
         // Check formula to apply.
         if (angle_min < angle_max) {
             // And condition.
-            state = (wind_direction_degrees > angle_min) && (wind_direction_degrees < angle_max) ? 0 : 1;
+            state = (wind_direction_degrees > angle_min) && (wind_direction_degrees < angle_max) ? 1 : 0;
         }
         else {
             // Or condition.
-            state = (wind_direction_degrees > angle_min) || (wind_direction_degrees < angle_max) ? 0 : 1;
+            state = (wind_direction_degrees > angle_min) || (wind_direction_degrees < angle_max) ? 1 : 0;
         }
         // Write pin.
         GPIO_write(SEN159001_WIND_DIRECTION_RESISTOR[idx].gpio, state);
