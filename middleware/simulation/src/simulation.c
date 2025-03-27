@@ -33,6 +33,8 @@
 #define SIMULATION_LOG_BAUD_RATE                9600
 #define SIMULATION_LOG_LINE_END                 "\r\n"
 
+#define SIMULATION_FAULT_TIME_THRESHOLD_MS      3900000
+
 /*** SIMULATION local structures ***/
 
 /*******************************************************************/
@@ -192,6 +194,8 @@ SIMULATION_status_t SIMULATION_start(void) {
     // Enable synchronization interrupt.
     simulation_ctx.flags.synchro_irq_enable = 1;
     EXTI_enable_gpio_interrupt(&GPIO_DUT_SYNCHRO);
+    // Reset time.
+    simulation_ctx.time_ms = 0;
     // Start timer.
     tim_status = TIM_STD_start(TIM_INSTANCE_SIMULATION, SIMULATION_WAVEFORM_TIMER_PERIOD_MS, TIM_UNIT_MS, &_SIMULATION_timer_callback);
     TIM_exit_error(SIMULATION_ERROR_BASE_WAVEFORM_TIMER);
@@ -222,6 +226,8 @@ SIMULATION_status_t SIMULATION_process(void) {
     TERMINAL_status_t terminal_status = TERMINAL_SUCCESS;
     uint8_t synchro_event = 0;
     uint8_t log_enable = GPIO_read(&GPIO_USB_DETECT);
+    // Check fault condition.
+    GPIO_write(&GPIO_LED_FAULT, ((simulation_ctx.time_ms > SIMULATION_FAULT_TIME_THRESHOLD_MS) ? 1 : 0));
     // Do not start before first DUT synchronization.
     if (simulation_ctx.flags.first_synchro == 0) goto errors;
     // Check synchronization flag.
