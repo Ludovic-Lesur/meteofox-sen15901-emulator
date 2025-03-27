@@ -18,6 +18,7 @@
 #include "terminal.h"
 #include "tim.h"
 #include "types.h"
+#include "version.h"
 
 /*** SIMULATION local macros ***/
 
@@ -93,6 +94,35 @@ static void _SIMULATION_timer_callback(void) {
     // Set flags.
     simulation_ctx.flags.timer = 1;
     simulation_ctx.time_ms += SIMULATION_WAVEFORM_TIMER_PERIOD_MS;
+}
+
+/*******************************************************************/
+static void _SIMULATION_print_sw_version(void) {
+    // Local variables.
+    TERMINAL_status_t terminal_status = TERMINAL_SUCCESS;
+    // Print string.
+    terminal_status = TERMINAL_flush_tx_buffer(0);
+    TERMINAL_stack_error(ERROR_BASE_TERMINAL);
+    terminal_status = TERMINAL_tx_buffer_add_string(0, "Version=sw");
+    TERMINAL_stack_error(ERROR_BASE_TERMINAL);
+    terminal_status = TERMINAL_tx_buffer_add_integer(0, GIT_MAJOR_VERSION, STRING_FORMAT_DECIMAL, 0);
+    TERMINAL_stack_error(ERROR_BASE_TERMINAL);
+    terminal_status = TERMINAL_tx_buffer_add_string(0, ".");
+    TERMINAL_stack_error(ERROR_BASE_TERMINAL);
+    terminal_status = TERMINAL_tx_buffer_add_integer(0, GIT_MINOR_VERSION, STRING_FORMAT_DECIMAL, 0);
+    TERMINAL_stack_error(ERROR_BASE_TERMINAL);
+    terminal_status = TERMINAL_tx_buffer_add_string(0, ".");
+    TERMINAL_stack_error(ERROR_BASE_TERMINAL);
+    terminal_status = TERMINAL_tx_buffer_add_integer(0, GIT_COMMIT_INDEX, STRING_FORMAT_DECIMAL, 0);
+    TERMINAL_stack_error(ERROR_BASE_TERMINAL);
+    if (GIT_DIRTY_FLAG != 0) {
+        terminal_status = TERMINAL_tx_buffer_add_string(0, ".dev");
+        TERMINAL_stack_error(ERROR_BASE_TERMINAL);
+    }
+    terminal_status = TERMINAL_tx_buffer_add_string(0, SIMULATION_LOG_LINE_END);
+    TERMINAL_stack_error(ERROR_BASE_TERMINAL);
+    terminal_status = TERMINAL_send_tx_buffer(0);
+    TERMINAL_stack_error(ERROR_BASE_TERMINAL);
 }
 
 /*******************************************************************/
@@ -303,6 +333,7 @@ SIMULATION_status_t SIMULATION_process(void) {
             terminal_status = TERMINAL_open(0, SIMULATION_LOG_BAUD_RATE, NULL);
             TERMINAL_stack_error(ERROR_BASE_TERMINAL);
             // Print current simulation values.
+            _SIMULATION_print_sw_version();
             if (synchro_event != 0) {
                 _SIMULATION_print_string("DUT_synchro");
             }
