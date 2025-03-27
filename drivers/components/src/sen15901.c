@@ -117,11 +117,11 @@ SEN15901_status_t SEN15901_set_wind_speed(uint32_t wind_speed_kmh) {
     // Check frequency.
     if (pwm_frequency_mhz == 0) {
         // Disable output signal.
-        pwm_frequency_mhz = 1;
+        pwm_frequency_mhz = 300;
         pwm_duty_cycle_percent = 0;
     }
     tim_status = TIM_PWM_set_waveform(TIM_INSTANCE_WIND_SPEED, TIM_CHANNEL_WIND_SPEED, pwm_frequency_mhz, pwm_duty_cycle_percent);
-    TIM_exit_error(SEN15901_ERROR_BASE_TIM_RAINFALL);
+    TIM_exit_error(SEN15901_ERROR_BASE_TIM_WIND_SPEED);
 errors:
     return status;
 }
