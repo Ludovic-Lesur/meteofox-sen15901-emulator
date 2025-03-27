@@ -15,9 +15,9 @@
 #include "mcu_mapping.h"
 #include "rtc.h"
 #include "sen15901.h"
+#include "terminal.h"
 #include "tim.h"
 #include "types.h"
-#include "usart.h"
 
 /*** SIMULATION local macros ***/
 
@@ -30,7 +30,8 @@
 
 #define SIMULATION_DUT_SYNCHRO_IRQ_FILTER_MS    60000
 
-#define SIMULATION_LOG_USART_BAUD_RATE          9600
+#define SIMULATION_LOG_BAUD_RATE                9600
+#define SIMULATION_LOG_LINE_END                 "\r\n"
 
 /*** SIMULATION local structures ***/
 
@@ -92,6 +93,48 @@ static void _SIMULATION_timer_callback(void) {
     simulation_ctx.time_ms += SIMULATION_WAVEFORM_TIMER_PERIOD_MS;
 }
 
+/*******************************************************************/
+static void _SIMULATION_print_string(char_t* str) {
+    // Local variables.
+    TERMINAL_status_t terminal_status = TERMINAL_SUCCESS;
+    // Print string.
+    terminal_status = TERMINAL_flush_tx_buffer(0);
+    TERMINAL_stack_error(ERROR_BASE_TERMINAL);
+    if (str != NULL) {
+        terminal_status = TERMINAL_tx_buffer_add_string(0, str);
+        TERMINAL_stack_error(ERROR_BASE_TERMINAL);
+    }
+    terminal_status = TERMINAL_tx_buffer_add_string(0, SIMULATION_LOG_LINE_END);
+    TERMINAL_stack_error(ERROR_BASE_TERMINAL);
+    terminal_status = TERMINAL_send_tx_buffer(0);
+    TERMINAL_stack_error(ERROR_BASE_TERMINAL);
+    return;
+}
+
+/*******************************************************************/
+static void _SIMULATION_print_value(char_t* name, int32_t value, char_t* unit) {
+    // Local variables.
+    TERMINAL_status_t terminal_status = TERMINAL_SUCCESS;
+    // Print value.
+    terminal_status = TERMINAL_flush_tx_buffer(0);
+    TERMINAL_stack_error(ERROR_BASE_TERMINAL);
+    if (name != NULL) {
+        terminal_status = TERMINAL_tx_buffer_add_string(0, name);
+        TERMINAL_stack_error(ERROR_BASE_TERMINAL);
+    }
+    terminal_status = TERMINAL_tx_buffer_add_integer(0, value, STRING_FORMAT_DECIMAL, 0);
+    TERMINAL_stack_error(ERROR_BASE_TERMINAL);
+    if (unit != NULL) {
+        terminal_status = TERMINAL_tx_buffer_add_string(0, unit);
+        TERMINAL_stack_error(ERROR_BASE_TERMINAL);
+    }
+    terminal_status = TERMINAL_tx_buffer_add_string(0, SIMULATION_LOG_LINE_END);
+    TERMINAL_stack_error(ERROR_BASE_TERMINAL);
+    terminal_status = TERMINAL_send_tx_buffer(0);
+    TERMINAL_stack_error(ERROR_BASE_TERMINAL);
+    return;
+}
+
 /*** SIMULATION functions ***/
 
 /*******************************************************************/
@@ -100,8 +143,6 @@ SIMULATION_status_t SIMULATION_init(void) {
     SIMULATION_status_t status = SIMULATION_SUCCESS;
     SEN15901_status_t sen15901_status = SEN15901_SUCCESS;
     TIM_status_t tim_status = TIM_SUCCESS;
-    USART_status_t usart_status = USART_SUCCESS;
-    USART_configuration_t usart_config;
     // Reset context.
     simulation_ctx.flags.all = 0;
     simulation_ctx.time_ms = 0;
@@ -119,16 +160,11 @@ SIMULATION_status_t SIMULATION_init(void) {
     // Init waveform timer.
     tim_status = TIM_STD_init(TIM_INSTANCE_SIMULATION, NVIC_PRIORITY_SIMULATION_WAVEFORM_TIMER);
     TIM_exit_error(SIMULATION_ERROR_BASE_WAVEFORM_TIMER);
-    // Init log interface.
-    usart_config.clock = RCC_CLOCK_SYSTEM;
-    usart_config.baud_rate = SIMULATION_LOG_USART_BAUD_RATE;
-    usart_config.nvic_priority = NVIC_PRIORITY_LOG_USART;
-    usart_config.rxne_irq_callback = NULL;
-    usart_status = USART_init(USART_INSTANCE_LOG, &USART_GPIO_LOG, &usart_config);
-    USART_exit_error(SIMULATION_ERROR_BASE_LOG_USART);
     // Init SEN15901 emulator.
     sen15901_status = SEN15901_init();
     SEN15901_exit_error(SIMULATION_ERROR_BASE_SEN15901);
+    // Init USB detect pin.
+    GPIO_configure(&GPIO_USB_DETECT, GPIO_MODE_INPUT, GPIO_TYPE_PUSH_PULL, GPIO_SPEED_LOW, GPIO_PULL_NONE);
 errors:
     return status;
 }
@@ -143,6 +179,8 @@ SIMULATION_status_t SIMULATION_de_init(void) {
     // Init SEN15901 emulator.
     sen15901_status = SEN15901_de_init();
     SEN15901_stack_error(ERROR_BASE_SIMULATION + SIMULATION_ERROR_BASE_SEN15901);
+    // Release USB detect pin.
+    GPIO_configure(&GPIO_USB_DETECT, GPIO_MODE_ANALOG, GPIO_TYPE_OPEN_DRAIN, GPIO_SPEED_LOW, GPIO_PULL_NONE);
     return status;
 }
 
@@ -181,13 +219,16 @@ SIMULATION_status_t SIMULATION_process(void) {
     // Local variables.
     SIMULATION_status_t status = SIMULATION_SUCCESS;
     SEN15901_status_t sen15901_status = SEN15901_SUCCESS;
-    USART_status_t usart_status = USART_SUCCESS;
+    TERMINAL_status_t terminal_status = TERMINAL_SUCCESS;
+    uint8_t synchro_event = 0;
+    uint8_t log_enable = GPIO_read(&GPIO_USB_DETECT);
     // Do not start before first DUT synchronization.
     if (simulation_ctx.flags.first_synchro == 0) goto errors;
     // Check synchronization flag.
     if (simulation_ctx.flags.synchro != 0) {
         // Clear flag.
         simulation_ctx.flags.synchro = 0;
+        synchro_event = 1;
         // Reset current values.
         simulation_ctx.time_ms = 0;
         simulation_ctx.wind_speed_kmh = 0;
@@ -198,17 +239,13 @@ SIMULATION_status_t SIMULATION_process(void) {
         simulation_ctx.wind_speed_peak_kmh = (simulation_ctx.wind_speed_peak_kmh + 1) % (SIMULATION_WIND_SPEED_KMH_MAX + 1);
         simulation_ctx.wind_direction_table_index = (simulation_ctx.wind_direction_table_index + 1) % SEN15901_WIND_DIRECTION_NUMBER;
         simulation_ctx.rainfall_peak_mm = (simulation_ctx.rainfall_peak_mm + 1) % (SIMULATION_RAINFALL_MM_MAX + 1);
-        // Log.
-        usart_status = USART_write(USART_INSTANCE_LOG, (uint8_t*) "DUT SYNCHRO\r\n", 14);
-        USART_exit_error(SIMULATION_ERROR_BASE_LOG_USART);
+        // Turn LED on.
+        GPIO_write(&GPIO_LED_SYNCHRO, 1);
     }
     // Manage synchronization interrupt.
     if (simulation_ctx.time_ms > SIMULATION_DUT_SYNCHRO_IRQ_FILTER_MS) {
         GPIO_write(&GPIO_LED_SYNCHRO, 0);
         simulation_ctx.flags.synchro_irq_enable = 1;
-    }
-    else {
-        GPIO_write(&GPIO_LED_SYNCHRO, 1);
     }
     // Check timer flag.
     if (simulation_ctx.flags.timer != 0) {
@@ -254,6 +291,24 @@ SIMULATION_status_t SIMULATION_process(void) {
             SEN15901_exit_error(SIMULATION_ERROR_BASE_SEN15901);
             // Update counter.
             simulation_ctx.rainfall_mm++;
+        }
+        if (log_enable != 0) {
+            // Open terminal.
+            terminal_status = TERMINAL_open(0, SIMULATION_LOG_BAUD_RATE, NULL);
+            TERMINAL_stack_error(ERROR_BASE_TERMINAL);
+            // Print current simulation values.
+            if (synchro_event != 0) {
+                _SIMULATION_print_string("DUT_synchro");
+            }
+            _SIMULATION_print_value("Wind_speed=", (int32_t) simulation_ctx.wind_speed_kmh, "km/h");
+            _SIMULATION_print_value("Wind_speed_peak=", (int32_t) simulation_ctx.wind_speed_peak_kmh, "km/h");
+            _SIMULATION_print_value("Wind_direction=", (int32_t) SIMULATION_WIND_DIRECTION_TABLE[simulation_ctx.wind_direction_table_index], "d");
+            _SIMULATION_print_value("Rainfall=", (int32_t) simulation_ctx.rainfall_mm, "mm");
+            _SIMULATION_print_value("Rainfall_peak=", (int32_t) simulation_ctx.rainfall_peak_mm, "mm");
+            _SIMULATION_print_string(NULL);
+            // Close terminal.
+            terminal_status = TERMINAL_close(0);
+            TERMINAL_stack_error(ERROR_BASE_TERMINAL);
         }
     }
 errors:

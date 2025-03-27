@@ -64,6 +64,7 @@ extern const TIM_gpio_t TIM_GPIO_RAINFALL;
 // DUT synchronization.
 extern const GPIO_pin_t GPIO_DUT_SYNCHRO;
 // Log.
+extern const GPIO_pin_t GPIO_USB_DETECT;
 extern const USART_gpio_t USART_GPIO_LOG;
 // LEDs.
 extern const GPIO_pin_t GPIO_LED_RUN;

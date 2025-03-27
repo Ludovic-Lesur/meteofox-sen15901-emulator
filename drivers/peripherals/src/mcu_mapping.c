@@ -48,6 +48,7 @@ const TIM_gpio_t TIM_GPIO_RAINFALL = { (const TIM_channel_gpio_t**) &TIM_CHANNEL
 // DUT synchronization.
 const GPIO_pin_t GPIO_DUT_SYNCHRO = { GPIOB, 1, 7, 0 };
 // Log.
+const GPIO_pin_t GPIO_USB_DETECT = { GPIOA, 0, 8, 0 };
 const USART_gpio_t USART_GPIO_LOG = { &GPIO_USART2_TX, &GPIO_USART2_RX };
 // LEDs.
 const GPIO_pin_t GPIO_LED_RUN = { GPIOB, 1, 3, 0 };
