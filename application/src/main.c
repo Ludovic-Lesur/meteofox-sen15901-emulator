@@ -55,6 +55,8 @@ static void _SEN15901_EMULATOR_init_hw(void) {
     GPIO_configure(&GPIO_TCXO_POWER_ENABLE, GPIO_MODE_OUTPUT, GPIO_TYPE_PUSH_PULL, GPIO_SPEED_LOW, GPIO_PULL_NONE);
     GPIO_write(&GPIO_TCXO_POWER_ENABLE, 1);
     // High speed oscillator.
+    rcc_status = RCC_switch_to_hsi();
+    RCC_stack_error(ERROR_BASE_RCC);
     rcc_status = RCC_switch_to_hse(RCC_HSE_MODE_BYPASS);
     RCC_stack_error(ERROR_BASE_RCC);
     // Calibrate internal clocks.
