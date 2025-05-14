@@ -15,6 +15,7 @@
 #include "mcu_mapping.h"
 #include "rtc.h"
 #include "sen15901.h"
+#include "sen15901_emulator_flags.h"
 #include "terminal.h"
 #include "tim.h"
 #include "types.h"
@@ -27,7 +28,11 @@
 #define SIMULATION_RAINFALL_MM_MAX              100
 #define SIMULATION_RAINFALL_TIMESTAMP_MS        1800000
 
+#ifdef SEN15901_MODE_ULTIMETER
+#define SIMULATION_WAVEFORM_TIMER_PERIOD_MS     6001
+#else
 #define SIMULATION_WAVEFORM_TIMER_PERIOD_MS     3001
+#endif
 
 #define SIMULATION_DUT_SYNCHRO_IRQ_FILTER_MS    60000
 

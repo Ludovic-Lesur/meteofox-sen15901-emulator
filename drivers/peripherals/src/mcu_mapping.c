@@ -9,6 +9,7 @@
 
 #include "gpio.h"
 #include "gpio_registers.h"
+#include "sen15901_emulator_flags.h"
 #include "tim.h"
 #include "usart.h"
 
@@ -16,13 +17,24 @@
 
 // Wind speed emulation.
 static const GPIO_pin_t GPIO_WIND_SPEED = { GPIOB, 1, 4, 4 };
+#ifdef SEN15901_MODE_ULTIMETER
+static const GPIO_pin_t GPIO_WIND_DIRECTION = { GPIOB, 1, 5, 4 };
+#endif
 // Rain gauge emulation.
 static const GPIO_pin_t GPIO_RAINFALL = { GPIOB, 1, 6, 5 };
 // Timer channels.
 static const TIM_channel_gpio_t TIM_CHANNEL_GPIO_WIND_SPEED = { TIM_CHANNEL_WIND_SPEED, &GPIO_WIND_SPEED, TIM_POLARITY_ACTIVE_HIGH };
+#ifdef SEN15901_MODE_ULTIMETER
+static const TIM_channel_gpio_t TIM_CHANNEL_GPIO_WIND_DIRECTION = { TIM_CHANNEL_WIND_DIRECTION, &GPIO_WIND_DIRECTION, TIM_POLARITY_ACTIVE_HIGH };
+#endif
 static const TIM_channel_gpio_t TIM_CHANNEL_GPIO_RAINFALL = { TIM_CHANNEL_RAINFALL, &GPIO_RAINFALL, TIM_POLARITY_ACTIVE_HIGH };
 // Timer pins list.
-static const TIM_channel_gpio_t* const TIM_CHANNEL_GPIO_LIST_WIND_SPEED[TIM_CHANNEL_INDEX_WIND_SPEED_LAST] = { &TIM_CHANNEL_GPIO_WIND_SPEED };
+static const TIM_channel_gpio_t* const TIM_CHANNEL_GPIO_LIST_WIND[TIM_CHANNEL_INDEX_WIND_LAST] = {
+    &TIM_CHANNEL_GPIO_WIND_SPEED,
+#ifdef SEN15901_MODE_ULTIMETER
+    &TIM_CHANNEL_GPIO_WIND_DIRECTION
+#endif
+};
 static const TIM_channel_gpio_t* const TIM_CHANNEL_GPIO_LIST_RAINFALL[TIM_CHANNEL_INDEX_RAINFALL_LAST] = { &TIM_CHANNEL_GPIO_RAINFALL };
 // USART2.
 static const GPIO_pin_t GPIO_USART2_TX = { GPIOA, 0, 9, 4 };
@@ -33,7 +45,7 @@ static const GPIO_pin_t GPIO_USART2_RX = { GPIOA, 0, 10, 4 };
 // TCXO power control.
 const GPIO_pin_t GPIO_TCXO_POWER_ENABLE = { GPIOA, 0, 2, 0 };
 // Wind speed emulation.
-const TIM_gpio_t TIM_GPIO_WIND_SPEED = { (const TIM_channel_gpio_t**) &TIM_CHANNEL_GPIO_LIST_WIND_SPEED, TIM_CHANNEL_INDEX_WIND_SPEED_LAST };
+const TIM_gpio_t TIM_GPIO_WIND = { (const TIM_channel_gpio_t**) &TIM_CHANNEL_GPIO_LIST_WIND, TIM_CHANNEL_INDEX_WIND_LAST };
 // Wind direction emulation.
 const GPIO_pin_t GPIO_WIND_DIRECTION_N =  { GPIOA, 0, 3, 0 };
 const GPIO_pin_t GPIO_WIND_DIRECTION_NE = { GPIOA, 0, 4, 0 };
