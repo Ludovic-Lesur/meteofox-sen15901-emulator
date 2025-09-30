@@ -45,14 +45,14 @@
 
 /*******************************************************************/
 typedef union {
+    uint8_t all;
     struct {
         unsigned wind_speed_down :1;
         unsigned timer :1;
         unsigned synchro :1;
         unsigned first_synchro :1;
         unsigned synchro_irq_enable :1;
-    } __attribute__((scalar_storage_order("big-endian")))__attribute__((packed));
-    uint8_t all;
+    } __attribute__((scalar_storage_order("big-endian"))) __attribute__((packed));
 } SIMULATION_flags_t;
 
 /*******************************************************************/
