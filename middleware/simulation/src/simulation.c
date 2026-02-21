@@ -25,7 +25,7 @@
 
 #define SIMULATION_WIND_SPEED_KMH_MAX           120
 
-#define SIMULATION_RAINFALL_MM_MAX              100
+#define SIMULATION_RAINFALL_IRQ_COUNT_MAX       110
 #define SIMULATION_RAINFALL_TIMESTAMP_MS        180000
 
 #ifdef SEN15901_MODE_ULTIMETER
@@ -63,10 +63,10 @@ typedef struct {
     // Amplitudes.
     uint32_t wind_speed_peak_kmh;
     uint32_t wind_direction_table_index;
-    uint32_t rainfall_peak_mm;
+    uint32_t rainfall_peak_irq_count;
     // Values within period.
     uint32_t wind_speed_kmh;
-    uint32_t rainfall_mm;
+    uint32_t rainfall_irq_count;
 } SIMULATION_context_t;
 
 /*** SIMULATION local global variables ***/
@@ -78,9 +78,9 @@ static SIMULATION_context_t simulation_ctx = {
     .time_ms = 0,
     .wind_speed_peak_kmh = 0,
     .wind_direction_table_index = (SEN15901_WIND_DIRECTION_NUMBER - 1),
-    .rainfall_peak_mm = 0,
+    .rainfall_peak_irq_count = 0,
     .wind_speed_kmh = 0,
-    .rainfall_mm = 0
+    .rainfall_irq_count = 0
 };
 
 /*** SIMULATION local functions ***/
@@ -185,9 +185,9 @@ SIMULATION_status_t SIMULATION_init(void) {
     simulation_ctx.time_ms = 0;
     simulation_ctx.wind_speed_peak_kmh = 0;
     simulation_ctx.wind_direction_table_index = (SEN15901_WIND_DIRECTION_NUMBER - 1);
-    simulation_ctx.rainfall_peak_mm = 0;
+    simulation_ctx.rainfall_peak_irq_count = 0;
     simulation_ctx.wind_speed_kmh = 0;
-    simulation_ctx.rainfall_mm = 0;
+    simulation_ctx.rainfall_irq_count = 0;
     // Init status LEDs.
     GPIO_configure(&GPIO_LED_RUN, GPIO_MODE_OUTPUT, GPIO_TYPE_PUSH_PULL, GPIO_SPEED_LOW, GPIO_PULL_NONE);
     GPIO_configure(&GPIO_LED_SYNCHRO, GPIO_MODE_OUTPUT, GPIO_TYPE_PUSH_PULL, GPIO_SPEED_LOW, GPIO_PULL_NONE);
@@ -274,12 +274,11 @@ SIMULATION_status_t SIMULATION_process(void) {
         simulation_ctx.time_ms = 0;
         simulation_ctx.wind_speed_kmh = 0;
         simulation_ctx.flags.wind_speed_down = 0;
-        simulation_ctx.rainfall_mm = 0;
-        SEN15901_reset_rainfall_mm();
+        simulation_ctx.rainfall_irq_count = 0;
         // Increment amplitudes.
         simulation_ctx.wind_speed_peak_kmh = (simulation_ctx.wind_speed_peak_kmh + 1) % (SIMULATION_WIND_SPEED_KMH_MAX + 1);
         simulation_ctx.wind_direction_table_index = (simulation_ctx.wind_direction_table_index + 1) % SEN15901_WIND_DIRECTION_NUMBER;
-        simulation_ctx.rainfall_peak_mm = (simulation_ctx.rainfall_peak_mm + 1) % (SIMULATION_RAINFALL_MM_MAX + 1);
+        simulation_ctx.rainfall_peak_irq_count = (simulation_ctx.rainfall_peak_irq_count + 1) % (SIMULATION_RAINFALL_IRQ_COUNT_MAX + 1);
         // Turn LED on.
         GPIO_write(&GPIO_LED_SYNCHRO, 1);
     }
@@ -326,12 +325,12 @@ SIMULATION_status_t SIMULATION_process(void) {
         sen15901_status = SEN15901_set_wind_direction(SIMULATION_WIND_DIRECTION_TABLE[simulation_ctx.wind_direction_table_index]);
         SEN15901_exit_error(SIMULATION_ERROR_BASE_SEN15901);
         // Rainfall.
-        if ((simulation_ctx.time_ms >= SIMULATION_RAINFALL_TIMESTAMP_MS) && (simulation_ctx.rainfall_mm < simulation_ctx.rainfall_peak_mm)) {
+        if ((simulation_ctx.time_ms >= SIMULATION_RAINFALL_TIMESTAMP_MS) && (simulation_ctx.rainfall_irq_count < simulation_ctx.rainfall_peak_irq_count)) {
             // Add rain.
-            sen15901_status = SEN15901_add_rainfall_mm(1);
+            sen15901_status = SEN15901_make_rainfall_interrupt();
             SEN15901_exit_error(SIMULATION_ERROR_BASE_SEN15901);
             // Update counter.
-            simulation_ctx.rainfall_mm++;
+            simulation_ctx.rainfall_irq_count++;
         }
         if (log_enable != 0) {
             // Open terminal.
@@ -345,8 +344,8 @@ SIMULATION_status_t SIMULATION_process(void) {
             _SIMULATION_print_value("Wind_speed=", (int32_t) simulation_ctx.wind_speed_kmh, "km/h");
             _SIMULATION_print_value("Wind_speed_peak=", (int32_t) simulation_ctx.wind_speed_peak_kmh, "km/h");
             _SIMULATION_print_value("Wind_direction=", (int32_t) SIMULATION_WIND_DIRECTION_TABLE[simulation_ctx.wind_direction_table_index], "d");
-            _SIMULATION_print_value("Rainfall=", (int32_t) simulation_ctx.rainfall_mm, "mm");
-            _SIMULATION_print_value("Rainfall_peak=", (int32_t) simulation_ctx.rainfall_peak_mm, "mm");
+            _SIMULATION_print_value("Rainfall=", (int32_t) simulation_ctx.rainfall_irq_count, "irq");
+            _SIMULATION_print_value("Rainfall_peak=", (int32_t) simulation_ctx.rainfall_peak_irq_count, "irq");
             _SIMULATION_print_string(NULL);
             // Close terminal.
             terminal_status = TERMINAL_close(0);

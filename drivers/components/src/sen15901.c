@@ -30,8 +30,6 @@
 
 #define SEN15901_RAINFALL_PULSE_DURATION_MS             200
 
-#define SEN15901_RAINFALL_EDGE_TO_UM                    279
-
 /*** SEN15901 local structures ***/
 
 #ifndef SEN15901_MODE_ULTIMETER
@@ -44,15 +42,13 @@ typedef struct {
 } SEN15901_wind_direction_resistor_t;
 #endif
 
+#ifdef SEN15901_MODE_ULTIMETER
 /*******************************************************************/
 typedef struct {
-#ifdef SEN15901_MODE_ULTIMETER
     uint32_t speed_pwm_frequency_mhz;
     uint8_t speed_pwm_duty_cycle;
-#endif
-    uint32_t rainfall_um;
-    uint32_t rainfall_target_um;
 } SEN15901_context_t;
+#endif
 
 /*** SEN15901 local global variables ***/
 
@@ -69,14 +65,12 @@ static SEN15901_wind_direction_resistor_t SEN159001_WIND_DIRECTION_RESISTOR[SEN1
 };
 #endif
 
-static SEN15901_context_t sen15901_ctx = {
 #ifdef SEN15901_MODE_ULTIMETER
+static SEN15901_context_t sen15901_ctx = {
     .speed_pwm_frequency_mhz = SEN15901_PWM_FREQUENCY_MIN_MHZ,
     .speed_pwm_duty_cycle = 0,
-#endif
-    .rainfall_um = 0,
-    .rainfall_target_um = 0
 };
+#endif
 
 /*** SEN15901 functions ***/
 
@@ -89,13 +83,11 @@ SEN15901_status_t SEN15901_init(void) {
     int32_t tmp_s32 = 0;
     uint8_t idx = 0;
 #endif
-    // Init context.
 #ifdef SEN15901_MODE_ULTIMETER
+    // Init context.
     sen15901_ctx.speed_pwm_frequency_mhz = SEN15901_PWM_FREQUENCY_MIN_MHZ;
     sen15901_ctx.speed_pwm_duty_cycle = 0;
 #endif
-    sen15901_ctx.rainfall_um = 0;
-    sen15901_ctx.rainfall_target_um = 0;
 #ifndef SEN15901_MODE_ULTIMETER
     // Init wind vane resistors.
     for (idx = 0; idx < SEN15901_WIND_DIRECTION_RESISTOR_NUMBER; idx++) {
@@ -214,34 +206,14 @@ errors:
 }
 
 /*******************************************************************/
-void SEN15901_reset_rainfall_mm(void) {
-    // Reset context.
-    sen15901_ctx.rainfall_um = 0;
-    sen15901_ctx.rainfall_target_um = 0;
-}
-
-/*******************************************************************/
-SEN15901_status_t SEN15901_add_rainfall_mm(uint32_t rainfall_mm) {
+SEN15901_status_t SEN15901_make_rainfall_interrupt(void) {
     // Local variables.
     SEN15901_status_t status = SEN15901_SUCCESS;
     TIM_status_t tim_status = TIM_SUCCESS;
     uint32_t pulse_duration_ns = (SEN15901_RAINFALL_PULSE_DURATION_MS * MATH_POWER_10[6]);
-    uint8_t pulse_is_done = 0;
-    // Update target.
-    sen15901_ctx.rainfall_target_um += (rainfall_mm * MATH_POWER_10[3]);
-    // Add required number of pulses.
-    while (sen15901_ctx.rainfall_um < sen15901_ctx.rainfall_target_um) {
-        // Make pulse.
-        tim_status = TIM_OPM_make_pulse(TIM_INSTANCE_RAINFALL, (0b1 << TIM_CHANNEL_RAINFALL), pulse_duration_ns, pulse_duration_ns, 0);
-        TIM_exit_error(SEN15901_ERROR_BASE_TIM_RAINFALL);
-        // Update count.
-        sen15901_ctx.rainfall_um += SEN15901_RAINFALL_EDGE_TO_UM;
-        // Wait for pulse to be completed.
-        do {
-            TIM_OPM_get_pulse_status(TIM_INSTANCE_RAINFALL, &pulse_is_done);
-        }
-        while (pulse_is_done == 0);
-    }
+    // Make pulse.
+    tim_status = TIM_OPM_make_pulse(TIM_INSTANCE_RAINFALL, (0b1 << TIM_CHANNEL_RAINFALL), pulse_duration_ns, pulse_duration_ns, 0);
+    TIM_exit_error(SEN15901_ERROR_BASE_TIM_RAINFALL);
 errors:
     return status;
 }

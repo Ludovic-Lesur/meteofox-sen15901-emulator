@@ -73,22 +73,13 @@ SEN15901_status_t SEN15901_set_wind_speed(uint32_t wind_speed_kmh);
 SEN15901_status_t SEN15901_set_wind_direction(uint32_t wind_direction_degrees);
 
 /*!******************************************************************
- * \fn void SEN15901_reset_rainfall_mm(void)
- * \brief Reset SEN15901 rainfall count.
+ * \fn SEN15901_status_t SEN15901_make_rainfall_interrupt(void)
+ * \brief Simulate a rainfall interrupt.
  * \param[in]   none
- * \param[out]  none
- * \retval      none
- *******************************************************************/
-void SEN15901_reset_rainfall_mm(void);
-
-/*!******************************************************************
- * \fn SEN15901_status_t SEN15901_add_rainfall_mm(uint32_t rainfall_mm)
- * \brief Set SEN15901 test waveform to simulate a rainfall.
- * \param[in]   rainfall_mm: Rainfall to add in mm.
  * \param[out]  none
  * \retval      Function execution status.
  *******************************************************************/
-SEN15901_status_t SEN15901_add_rainfall_mm(uint32_t rainfall_mm);
+SEN15901_status_t SEN15901_make_rainfall_interrupt(void);
 
 /*******************************************************************/
 #define SEN15901_exit_error(base) { ERROR_check_exit(sen15901_status, SEN15901_SUCCESS, base) }
