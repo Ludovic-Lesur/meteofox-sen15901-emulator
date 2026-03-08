@@ -42,6 +42,8 @@ static const GPIO_pin_t GPIO_USART2_RX = { GPIOA, 0, 10, 4 };
 
 /*** MCU MAPPING global variables ***/
 
+// Battery charger control.
+const GPIO_pin_t GPIO_BATTERY_CHARGER_DISABLE = { GPIOA, 0, 11, 0 };
 // TCXO power control.
 const GPIO_pin_t GPIO_TCXO_POWER_ENABLE = { GPIOA, 0, 2, 0 };
 // Wind speed emulation.

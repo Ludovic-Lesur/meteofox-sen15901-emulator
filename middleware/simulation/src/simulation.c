@@ -188,6 +188,8 @@ SIMULATION_status_t SIMULATION_init(void) {
     simulation_ctx.rainfall_peak_irq_count = 0;
     simulation_ctx.wind_speed_kmh = 0;
     simulation_ctx.rainfall_irq_count = 0;
+    // Init battery charger control pin.
+    GPIO_configure(&GPIO_BATTERY_CHARGER_DISABLE, GPIO_MODE_OUTPUT, GPIO_TYPE_PUSH_PULL, GPIO_SPEED_LOW, GPIO_PULL_NONE);
     // Init status LEDs.
     GPIO_configure(&GPIO_LED_RUN, GPIO_MODE_OUTPUT, GPIO_TYPE_PUSH_PULL, GPIO_SPEED_LOW, GPIO_PULL_NONE);
     GPIO_configure(&GPIO_LED_SYNCHRO, GPIO_MODE_OUTPUT, GPIO_TYPE_PUSH_PULL, GPIO_SPEED_LOW, GPIO_PULL_NONE);
@@ -281,10 +283,12 @@ SIMULATION_status_t SIMULATION_process(void) {
         simulation_ctx.rainfall_peak_irq_count = (simulation_ctx.rainfall_peak_irq_count + 1) % (SIMULATION_RAINFALL_IRQ_COUNT_MAX + 1);
         // Turn LED on.
         GPIO_write(&GPIO_LED_SYNCHRO, 1);
+        GPIO_write(&GPIO_BATTERY_CHARGER_DISABLE, 1);
     }
     // Manage synchronization interrupt.
     if (simulation_ctx.time_ms > SIMULATION_DUT_SYNCHRO_IRQ_FILTER_MS) {
         GPIO_write(&GPIO_LED_SYNCHRO, 0);
+        GPIO_write(&GPIO_BATTERY_CHARGER_DISABLE, 0);
         simulation_ctx.flags.synchro_irq_enable = 1;
     }
     // Check timer flag.

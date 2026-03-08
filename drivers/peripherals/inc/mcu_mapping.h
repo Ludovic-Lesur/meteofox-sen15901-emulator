@@ -51,6 +51,8 @@ typedef enum {
 
 /*** MCU MAPPING global variables ***/
 
+// Battery charger control.
+extern const GPIO_pin_t GPIO_BATTERY_CHARGER_DISABLE;
 // TCXO power control.
 extern const GPIO_pin_t GPIO_TCXO_POWER_ENABLE;
 // Wind speed emulation.
