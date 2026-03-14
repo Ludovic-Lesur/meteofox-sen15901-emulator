@@ -10,3 +10,6 @@
 [submodule "embedded-utils"]
     path = drivers/utils/embedded-utils
     url = https://github.com/Ludovic-Lesur/embedded-utils.git
+[submodule "cmake-arm-none-eabi"]
+    path = script/cmake-arm-none-eabi
+    url = https://github.com/Ludovic-Lesur/cmake-arm-none-eabi.git

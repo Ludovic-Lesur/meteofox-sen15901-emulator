@@ -34,3 +34,18 @@ The project is organized as follow:
 * `middleware` :
     * `simulation` : SEN15901 **simulator state machine**.
 * `application` : Main **application**.
+
+## Build
+
+The project can be compiled by command line with `cmake`.
+
+```bash
+mkdir build
+cd build
+cmake -DCMAKE_TOOLCHAIN_FILE="script/cmake-arm-none-eabi/toolchain.cmake" \
+      -DTOOLCHAIN_PATH="<arm_none_eabi_gcc_path>" \
+      -DSEN15901_EMULATOR_HW_VERSION="<cmake_hw_version>" \
+      -DSEN15901_EMULATOR_MODE_ULTIMETER=OFF \
+      -G "Unix Makefiles" ..
+make all
+```
