@@ -23,7 +23,7 @@
 #define SEN15901_WIND_SPEED_1HZ_TO_MH                   2400
 #endif
 
-#define SEN15901_PWM_FREQUENCY_MIN_MHZ                  (1000000 / SEN15901_WIND_SPEED_1HZ_TO_MH)
+#define SEN15901_PWM_FREQUENCY_MHZ_MIN                  (1000000 / SEN15901_WIND_SPEED_1HZ_TO_MH)
 
 #define SEN15901_WIND_DIRECTION_RESISTOR_NUMBER         8
 #define SEN15901_WIND_DIRECTION_RESISTOR_RANGE_DEGREES  34
@@ -67,7 +67,7 @@ static SEN15901_wind_direction_resistor_t SEN159001_WIND_DIRECTION_RESISTOR[SEN1
 
 #ifdef SEN15901_MODE_ULTIMETER
 static SEN15901_context_t sen15901_ctx = {
-    .speed_pwm_frequency_mhz = SEN15901_PWM_FREQUENCY_MIN_MHZ,
+    .speed_pwm_frequency_mhz = SEN15901_PWM_FREQUENCY_MHZ_MIN,
     .speed_pwm_duty_cycle = 0,
 };
 #endif
@@ -85,7 +85,7 @@ SEN15901_status_t SEN15901_init(void) {
 #endif
 #ifdef SEN15901_MODE_ULTIMETER
     // Init context.
-    sen15901_ctx.speed_pwm_frequency_mhz = SEN15901_PWM_FREQUENCY_MIN_MHZ;
+    sen15901_ctx.speed_pwm_frequency_mhz = SEN15901_PWM_FREQUENCY_MHZ_MIN;
     sen15901_ctx.speed_pwm_duty_cycle = 0;
 #endif
 #ifndef SEN15901_MODE_ULTIMETER
@@ -136,7 +136,7 @@ SEN15901_status_t SEN15901_set_wind_speed(uint32_t wind_speed_kmh) {
     // Check frequency.
     if (pwm_frequency_mhz == 0) {
         // Disable output signal.
-        pwm_frequency_mhz = SEN15901_PWM_FREQUENCY_MIN_MHZ;
+        pwm_frequency_mhz = SEN15901_PWM_FREQUENCY_MHZ_MIN;
         pwm_duty_cycle_percent = 0;
     }
 #ifdef SEN15901_MODE_ULTIMETER
@@ -210,9 +210,9 @@ SEN15901_status_t SEN15901_make_rainfall_interrupt(void) {
     // Local variables.
     SEN15901_status_t status = SEN15901_SUCCESS;
     TIM_status_t tim_status = TIM_SUCCESS;
-    uint32_t pulse_duration_ns = (SEN15901_RAINFALL_PULSE_DURATION_MS * MATH_POWER_10[6]);
+    uint32_t pulse_duration_us = (SEN15901_RAINFALL_PULSE_DURATION_MS * MATH_POWER_10[3]);
     // Make pulse.
-    tim_status = TIM_OPM_make_pulse(TIM_INSTANCE_RAINFALL, (0b1 << TIM_CHANNEL_RAINFALL), pulse_duration_ns, pulse_duration_ns, 0);
+    tim_status = TIM_OPM_make_pulse(TIM_INSTANCE_RAINFALL, (0b1 << TIM_CHANNEL_RAINFALL), pulse_duration_us, pulse_duration_us, 0);
     TIM_exit_error(SEN15901_ERROR_BASE_TIM_RAINFALL);
 errors:
     return status;
