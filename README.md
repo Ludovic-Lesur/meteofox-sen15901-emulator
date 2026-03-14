@@ -6,9 +6,9 @@ The aim of this project is to design a **SEN-15901 emulator**. The program simul
 
 The board was designed on **Circuit Maker V2.0**. Below is the list of hardware revisions:
 
-| Hardware revision | Description | Status |
-|:---:|:---:|:---:|
-| [SEN15901-EMULATOR HW1.0](https://365.altium.com/files/107B18F5-BE93-4D1A-97D6-74040E0FA2C4) | Initial version. | :white_check_mark: |
+| Hardware revision | Description | `cmake_hw_version` | Status |
+|:---:|:---:|:---:|:---:|
+| [SEN15901-EMULATOR HW1.0](https://365.altium.com/files/107B18F5-BE93-4D1A-97D6-74040E0FA2C4) | Initial version. | `HW1_0` | :white_check_mark: |
 
 # Embedded software
 
