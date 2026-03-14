@@ -1,0 +1,22 @@
+{
+    "hw_configuration_list": [
+        {
+            "hw_flags": {
+                "SEN15901_EMULATOR_HW_VERSION": "HW1_0"
+            },
+            "sw_configuration_list": [
+                {
+                    "sw_flags": {
+                        "SEN15901_MODE_ULTIMETER": "OFF"
+                    }
+                },
+                {
+                    "name": "ultimeter",
+                    "sw_flags": {
+                        "SEN15901_MODE_ULTIMETER": "ON"
+                    }
+                }
+            ]
+        }
+    ]
+}
