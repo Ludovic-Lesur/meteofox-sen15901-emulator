@@ -26,12 +26,12 @@
 #define SIMULATION_WIND_SPEED_KMH_MAX           120
 
 #define SIMULATION_RAINFALL_IRQ_COUNT_MAX       110
-#define SIMULATION_RAINFALL_TIMESTAMP_MS        180000
+#define SIMULATION_RAINFALL_TIMESTAMP_MS        1800000
 
 #ifdef SEN15901_MODE_ULTIMETER
-#define SIMULATION_WAVEFORM_TIMER_PERIOD_MS     6001
+#define SIMULATION_WAVEFORM_TIMER_PERIOD_MS     12001
 #else
-#define SIMULATION_WAVEFORM_TIMER_PERIOD_MS     3001
+#define SIMULATION_WAVEFORM_TIMER_PERIOD_MS     6001
 #endif
 
 #define SIMULATION_DUT_SYNCHRO_IRQ_FILTER_MS    60000
@@ -106,7 +106,7 @@ static void _SIMULATION_print_sw_version(void) {
     // Local variables.
     TERMINAL_status_t terminal_status = TERMINAL_SUCCESS;
     // Print string.
-    terminal_status = TERMINAL_flush_tx_buffer(0);
+    terminal_status = TERMINAL_tx_buffer_flush(0);
     TERMINAL_stack_error(ERROR_BASE_TERMINAL);
     terminal_status = TERMINAL_tx_buffer_add_string(0, "Version=sw");
     TERMINAL_stack_error(ERROR_BASE_TERMINAL);
@@ -126,7 +126,7 @@ static void _SIMULATION_print_sw_version(void) {
     }
     terminal_status = TERMINAL_tx_buffer_add_string(0, SIMULATION_LOG_LINE_END);
     TERMINAL_stack_error(ERROR_BASE_TERMINAL);
-    terminal_status = TERMINAL_send_tx_buffer(0);
+    terminal_status = TERMINAL_tx_buffer_send(0);
     TERMINAL_stack_error(ERROR_BASE_TERMINAL);
 }
 
@@ -135,7 +135,7 @@ static void _SIMULATION_print_string(char_t* str) {
     // Local variables.
     TERMINAL_status_t terminal_status = TERMINAL_SUCCESS;
     // Print string.
-    terminal_status = TERMINAL_flush_tx_buffer(0);
+    terminal_status = TERMINAL_tx_buffer_flush(0);
     TERMINAL_stack_error(ERROR_BASE_TERMINAL);
     if (str != NULL) {
         terminal_status = TERMINAL_tx_buffer_add_string(0, str);
@@ -143,7 +143,7 @@ static void _SIMULATION_print_string(char_t* str) {
     }
     terminal_status = TERMINAL_tx_buffer_add_string(0, SIMULATION_LOG_LINE_END);
     TERMINAL_stack_error(ERROR_BASE_TERMINAL);
-    terminal_status = TERMINAL_send_tx_buffer(0);
+    terminal_status = TERMINAL_tx_buffer_send(0);
     TERMINAL_stack_error(ERROR_BASE_TERMINAL);
     return;
 }
@@ -153,7 +153,7 @@ static void _SIMULATION_print_value(char_t* name, int32_t value, char_t* unit) {
     // Local variables.
     TERMINAL_status_t terminal_status = TERMINAL_SUCCESS;
     // Print value.
-    terminal_status = TERMINAL_flush_tx_buffer(0);
+    terminal_status = TERMINAL_tx_buffer_flush(0);
     TERMINAL_stack_error(ERROR_BASE_TERMINAL);
     if (name != NULL) {
         terminal_status = TERMINAL_tx_buffer_add_string(0, name);
@@ -167,7 +167,7 @@ static void _SIMULATION_print_value(char_t* name, int32_t value, char_t* unit) {
     }
     terminal_status = TERMINAL_tx_buffer_add_string(0, SIMULATION_LOG_LINE_END);
     TERMINAL_stack_error(ERROR_BASE_TERMINAL);
-    terminal_status = TERMINAL_send_tx_buffer(0);
+    terminal_status = TERMINAL_tx_buffer_send(0);
     TERMINAL_stack_error(ERROR_BASE_TERMINAL);
     return;
 }
